@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-minder-firewall",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Minder firewall for DeepSeek Harness",
   "license": "MIT",
   "type": "module",
@@ -13,7 +13,7 @@
   "engines": { "node": ">=24.9.0", "dsh": "0.2.2-rc.5" },
   "publishConfig": { "access": "public" },
   "scripts": { "build": "tsc -p tsconfig.json", "prepack": "pnpm run build" },
-  "dependencies": { "@minder/core-firewall": "0.1.1" },
+  "dependencies": { "@minder/core-firewall": "0.1.2" },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.1.0",
     "@deepseek-ai/dsh-commands": "0.2.2-rc.5",

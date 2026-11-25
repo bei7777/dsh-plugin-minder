@@ -4,12 +4,12 @@
 
 ## 安装与启动
 
-开发和验证使用 Node.js 24.9.0 或更高版本、pnpm 10.15.0、DSH 0.2.2-rc.5。使用已经发布到当前注册表的包时，在现有 Web profile 中按需安装。
+开发和验证使用 Node.js 24.9.0 或更高版本、pnpm 10.15.0、DSH 0.2.2-rc.5。该版本的 `dsh plugin` 要求在 `add` 前指定 `--profile <名称>`。对已经发布到当前注册表的包，可在现有 Web profile 中按需安装。
 
 ```sh
-dsh plugin --profile web add dsh-plugin-minder-snapshot@0.1.1
-dsh plugin --profile web add dsh-plugin-minder-memory@0.1.1
-dsh plugin --profile web add dsh-plugin-minder-firewall@0.1.1
+dsh plugin --profile web add dsh-plugin-minder-snapshot@0.1.2
+dsh plugin --profile web add dsh-plugin-minder-memory@0.1.2
+dsh plugin --profile web add dsh-plugin-minder-firewall@0.1.2
 dsh --profile web --dump-config
 dsh web
 ```
@@ -70,12 +70,22 @@ pnpm --filter "./packages/*" pack --pack-destination .minder-dev/packs
 
 `pnpm test` 使用独立的 DSH home 启动真实 SDK 宿主，在真实会话内测试两次工具调用共享事务、读取暂存内容、拒绝旁路写入、正常提交、取消、失败与撤销。记忆验收检查会话摘要和人工批准。防火墙验收向观察目录写入文件，再确认生成的行动卡。临时数据保存在本仓库忽略的 `.minder-dev/tests`。工具执行器直接接受测试输入，此验收无需调用模型。
 
-将三个 DSH 包和三个核心包发布到本地测试注册表并设置 `MINDER_TEST_REGISTRY` 后，执行 `pnpm run test:installed`。该命令初始化独立的 SDK profile，使用 `dsh plugin add` 安装三个精确版本，校验最终配置，再对安装产物执行相同的宿主测试。
+将三个 DSH 包和三个核心包发布到本地测试注册表并设置 `MINDER_TEST_REGISTRY` 后，执行 `pnpm run test:installed`。该命令初始化独立的 SDK profile，使用 `dsh plugin --profile minder-ci add` 安装三个精确版本，校验最终配置，再对安装产物执行相同的宿主测试。
 
 ## 发布
 
-分别构建和检查三个 tarball。公开仓库发布时给 GitHub 仓库添加 `dsh-plugin` topic，并在每个包的 repository 元数据中填写真实仓库地址与包的子目录。DSH Plugin Hub 支持 npm 自动发现；发布验收应核对三个包各自的展示页面、版本和安装结果。[DSH 官方打包规范](https://deepseek-harness.github.io/deepseek-harness/en/develop/basic/publish) · [社区 Plugin Hub 说明](https://dshpluginhub.ai/en/docs/first-plugin)
+独立社区目录 DSH Plugin Hub 的发布校验器要求每个插件的 `package.json` 声明真实、公开的 GitHub 仓库地址。维护者取得公开仓库后，在三个包中分别设置 `repository.url` 和 `repository.directory`，子目录依次为 `packages/snapshot`、`packages/memory`、`packages/firewall`。目前仓库地址待填写，此项公开发布验收尚未通过。可分别运行以下检查。[社区发布说明](https://dshpluginhub.ai/en/docs/first-plugin) · [社区校验器](https://github.com/pax-beehive/dsh-hub-cli)
+
+```sh
+npm exec --yes --package=@dsh-plugin-hub/cli@0.5.0 -- dsh-hub validate packages/snapshot --json --no-telemetry
+npm exec --yes --package=@dsh-plugin-hub/cli@0.5.0 -- dsh-hub validate packages/memory --json --no-telemetry
+npm exec --yes --package=@dsh-plugin-hub/cli@0.5.0 -- dsh-hub validate packages/firewall --json --no-telemetry
+```
+
+发布到公共 npm 时，先发布三个核心包，再发布包含 `lib/` 和 Cordis 补丁的三个插件归档。在空白 profile 中逐个按包名和版本安装并启动宿主，确认安装期间无需批准构建脚本。社区 Hub 异步发现公开的 npm 包，验收时核对三个插件各自的展示页面、版本与安装命令。公开 GitHub 仓库的 `dsh-plugin` topic 可用于发现源码条目。[DSH 官方打包说明](https://deepseek-harness.github.io/deepseek-harness/en/develop/basic/publish.html) · [社区目录收录条件](https://dshpluginhub.ai/en/docs/plugin-not-found)
+
+DSH 客户端的 Discover 页面使用用户为当前 profile 配置的索引。在客户端启用实验功能 Custom plugin indexes 并添加相应的索引 URL 后，可通过 Discover 搜索该索引收录的插件。[DSH 官方索引说明](https://deepseek-harness.github.io/deepseek-harness/en/guide/plugin-market)
 
 ## 许可证
 
-三个 Minder 插件及各自直接依赖的 `@minder/core-snapshot`、`@minder/core-memory`、`@minder/core-firewall` 0.1.1 均采用 MIT 许可证，许可证随包保存在 `LICENSE`。已核实 npm 发行物中 `@deepseek-ai/cordis@4.1.0/LICENSE` 署名 Shigma，DSH 0.2.2-rc.5 的 CLI、tools、commands、sandbox-policy 和 user-questions 包各自的 `LICENSE` 署名 DeepSeek，均采用 MIT 许可证。插件通过 peer dependencies 使用这些宿主组件。再次分发这些组件的源码或编译产物时，保留各包的版权声明与完整许可证。
+三个 Minder 插件及各自直接依赖的 `@minder/core-snapshot`、`@minder/core-memory`、`@minder/core-firewall` 0.1.2 均采用 MIT 许可证，许可证随包保存在 `LICENSE`。已核实 npm 发行物中 `@deepseek-ai/cordis@4.1.0/LICENSE` 署名 Shigma，DSH 0.2.2-rc.5 的 CLI、tools、commands、sandbox-policy 和 user-questions 包各自的 `LICENSE` 署名 DeepSeek，均采用 MIT 许可证。插件通过 peer dependencies 使用这些宿主组件。再次分发这些组件的源码或编译产物时，保留各包的版权声明与完整许可证。
