@@ -1,0 +1,3 @@
+- insert:
+    - id: minder-snapshot
+      name: dsh-plugin-minder-snapshot

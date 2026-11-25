@@ -1,0 +1,3 @@
+- insert:
+    - id: minder-memory
+      name: dsh-plugin-minder-memory

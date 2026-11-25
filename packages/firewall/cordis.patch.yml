@@ -1,0 +1,3 @@
+- insert:
+    - id: minder-firewall
+      name: dsh-plugin-minder-firewall

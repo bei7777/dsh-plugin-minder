@@ -1,0 +1,31 @@
+{
+  "name": "dsh-plugin-minder-snapshot",
+  "version": "0.1.1",
+  "description": "Minder snapshot for DeepSeek Harness",
+  "license": "MIT",
+  "type": "module",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "exports": { ".": { "types": "./lib/index.d.ts", "import": "./lib/index.js" } },
+  "files": ["lib/", "cordis.patch.yml", "LICENSE"],
+  "keywords": ["dsh-plugin", "deepseek-harness", "minder", "snapshot"],
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
+  "engines": { "node": ">=24.9.0", "dsh": "0.2.2-rc.5" },
+  "publishConfig": { "access": "public" },
+  "scripts": { "build": "tsc -p tsconfig.json", "prepack": "pnpm run build" },
+  "dependencies": { "@minder/core-snapshot": "0.1.1" },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0",
+    "@deepseek-ai/dsh-user-questions": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-sandbox-policy": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-commands": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-tools": "0.2.2-rc.5"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.1.0",
+    "@deepseek-ai/dsh-user-questions": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-sandbox-policy": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-commands": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-tools": "0.2.2-rc.5"
+  }
+}

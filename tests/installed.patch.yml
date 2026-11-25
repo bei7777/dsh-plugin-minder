@@ -1,0 +1,7 @@
+- id: minder-firewall
+  config:
+    directories: !!js '[process.env.MINDER_TEST_WATCH]'
+    pollSeconds: 1
+- insert:
+    - id: minder-host-probe
+      name: ./host-probe.ts

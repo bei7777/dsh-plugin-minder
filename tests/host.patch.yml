@@ -1,0 +1,12 @@
+- insert:
+    - id: minder-snapshot-host-test
+      name: ../packages/snapshot/lib/index.js
+    - id: minder-memory-host-test
+      name: ../packages/memory/lib/index.js
+    - id: minder-firewall-host-test
+      name: ../packages/firewall/lib/index.js
+      config:
+        directories: !!js '[process.env.MINDER_TEST_WATCH]'
+        pollSeconds: 1
+    - id: minder-host-probe
+      name: ./host-probe.ts
