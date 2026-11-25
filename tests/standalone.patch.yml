@@ -1,0 +1,3 @@
+- insert:
+    - id: minder-standalone-test
+      name: ./standalone.ts

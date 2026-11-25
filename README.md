@@ -70,7 +70,7 @@ pnpm --filter "./packages/*" pack --pack-destination .minder-dev/packs
 
 `pnpm test` 使用独立的 DSH home 启动真实 SDK 宿主，在真实会话内测试两次工具调用共享事务、读取暂存内容、拒绝旁路写入、正常提交、取消、失败与撤销。记忆验收检查会话摘要和人工批准。防火墙验收向观察目录写入文件，再确认生成的行动卡。临时数据保存在本仓库忽略的 `.minder-dev/tests`。工具执行器直接接受测试输入，此验收无需调用模型。
 
-将三个 DSH 包和三个核心包发布到本地测试注册表并设置 `MINDER_TEST_REGISTRY` 后，执行 `pnpm run test:installed`。该命令初始化独立的 SDK profile，使用 `dsh plugin --profile minder-ci add` 安装三个精确版本，校验最终配置，再对安装产物执行相同的宿主测试。
+将三个 DSH 包和三个核心包发布到测试注册表并设置 `MINDER_TEST_REGISTRY` 后，执行 `pnpm run test:installed`。该命令为每个插件初始化独立的 SDK profile，使用 `dsh plugin --profile minder-ci add` 安装精确版本，核对注册表来源和锁文件中的 SHA-512，调用一个实际工具，并确认另外两组工具未启用。最后在一个新 profile 内安装全部插件，验证三者可以共同工作。公共发布后将 `MINDER_TEST_REGISTRY` 设为 `https://registry.npmjs.org/` 可以执行相同验收。
 
 ## 发布
 
