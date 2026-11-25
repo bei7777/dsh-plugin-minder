@@ -7,9 +7,9 @@
 开发和验证使用 Node.js 24.9.0 或更高版本、pnpm 10.15.0、DSH 0.2.2-rc.5。该版本的 `dsh plugin` 要求在 `add` 前指定 `--profile <名称>`。对已经发布到当前注册表的包，可在现有 Web profile 中按需安装。
 
 ```sh
-dsh plugin --profile web add dsh-plugin-minder-snapshot@0.1.2
-dsh plugin --profile web add dsh-plugin-minder-memory@0.1.2
-dsh plugin --profile web add dsh-plugin-minder-firewall@0.1.2
+dsh plugin --profile web add dsh-plugin-minder-snapshot@0.1.4
+dsh plugin --profile web add dsh-plugin-minder-memory@0.1.4
+dsh plugin --profile web add dsh-plugin-minder-firewall@0.1.4
 dsh --profile web --dump-config
 dsh web
 ```
@@ -74,7 +74,7 @@ pnpm --filter "./packages/*" pack --pack-destination .minder-dev/packs
 
 ## 发布
 
-独立社区目录 DSH Plugin Hub 的发布校验器要求每个插件的 `package.json` 声明真实、公开的 GitHub 仓库地址。维护者取得公开仓库后，在三个包中分别设置 `repository.url` 和 `repository.directory`，子目录依次为 `packages/snapshot`、`packages/memory`、`packages/firewall`。目前仓库地址待填写，此项公开发布验收尚未通过。可分别运行以下检查。[社区发布说明](https://dshpluginhub.ai/en/docs/first-plugin) · [社区校验器](https://github.com/pax-beehive/dsh-hub-cli)
+三个插件分别声明 GitHub 仓库及对应源码目录、Hub 显示名称与摘要、已验证的 DSH 与 Node.js 版本和 Cordis 配置条目。运行社区目录校验器可以检查每个包的清单和补丁。[社区发布说明](https://dshpluginhub.ai/en/docs/first-plugin) · [社区校验器](https://github.com/pax-beehive/dsh-hub-cli)
 
 ```sh
 npm exec --yes --package=@dsh-plugin-hub/cli@0.5.0 -- dsh-hub validate packages/snapshot --json --no-telemetry
@@ -88,4 +88,4 @@ DSH 客户端的 Discover 页面使用用户为当前 profile 配置的索引。
 
 ## 许可证
 
-三个 Minder 插件及各自直接依赖的 `@minder/core-snapshot`、`@minder/core-memory`、`@minder/core-firewall` 0.1.2 均采用 MIT 许可证，许可证随包保存在 `LICENSE`。已核实 npm 发行物中 `@deepseek-ai/cordis@4.1.0/LICENSE` 署名 Shigma，DSH 0.2.2-rc.5 的 CLI、tools、commands、sandbox-policy 和 user-questions 包各自的 `LICENSE` 署名 DeepSeek，均采用 MIT 许可证。插件通过 peer dependencies 使用这些宿主组件。再次分发这些组件的源码或编译产物时，保留各包的版权声明与完整许可证。
+三个 Minder 插件及其直接依赖 `@minder/core-snapshot`、`@minder/core-memory`、`@minder/core-firewall` 均采用 MIT 许可证，许可证随包保存在 `LICENSE`。已核实 npm 发行物中 `@deepseek-ai/cordis@4.1.0/LICENSE` 署名 Shigma，DSH 0.2.2-rc.5 的 CLI、tools、commands、sandbox-policy 和 user-questions 包各自的 `LICENSE` 署名 DeepSeek，均采用 MIT 许可证。插件通过 peer dependencies 使用这些宿主组件。再次分发这些组件的源码或编译产物时，保留各包的版权声明与完整许可证。

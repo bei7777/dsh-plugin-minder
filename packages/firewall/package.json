@@ -1,7 +1,12 @@
 {
   "name": "dsh-plugin-minder-firewall",
-  "version": "0.1.2",
-  "description": "Minder firewall for DeepSeek Harness",
+  "version": "0.1.4",
+  "description": "Triage directory and feed events with quiet hours, grouped notifications and an action inbox.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bei7777/dsh-plugin-minder.git",
+    "directory": "packages/firewall"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./lib/index.js",
@@ -9,11 +14,20 @@
   "exports": { ".": { "types": "./lib/index.d.ts", "import": "./lib/index.js" } },
   "files": ["lib/", "cordis.patch.yml", "LICENSE"],
   "keywords": ["dsh-plugin", "deepseek-harness", "minder", "firewall"],
-  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "hub": {
+      "schemaVersion": 1,
+      "displayName": "Minder Attention Firewall",
+      "summary": "Archive routine events and deliver urgent directory or feed updates as action cards.",
+      "entryIds": ["minder-firewall"],
+      "compatibility": { "dsh": "0.2.2-rc.5", "node": ">=24.9.0" }
+    }
+  },
   "engines": { "node": ">=24.9.0", "dsh": "0.2.2-rc.5" },
   "publishConfig": { "access": "public" },
   "scripts": { "build": "tsc -p tsconfig.json", "prepack": "pnpm run build" },
-  "dependencies": { "@minder/core-firewall": "0.1.2" },
+  "dependencies": { "@minder/core-firewall": "0.1.4" },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.1.0",
     "@deepseek-ai/dsh-commands": "0.2.2-rc.5",
