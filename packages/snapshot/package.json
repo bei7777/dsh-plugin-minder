@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-minder-snapshot",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Stage local file changes in a task, review the diff and undo the transaction.",
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@
   "engines": { "node": ">=24.9.0", "dsh": "0.2.2-rc.5" },
   "publishConfig": { "access": "public" },
   "scripts": { "build": "tsc -p tsconfig.json", "prepack": "pnpm run build" },
-  "dependencies": { "@minder/core-snapshot": "0.1.4" },
+  "dependencies": { "@minder/core-snapshot": "0.2.0" },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.1.0",
     "@deepseek-ai/dsh-user-questions": "0.2.2-rc.5",

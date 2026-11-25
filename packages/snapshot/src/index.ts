@@ -3,7 +3,7 @@ import type {} from "@deepseek-ai/dsh-commands";
 import type {} from "@deepseek-ai/dsh-sandbox-policy";
 import type {} from "@deepseek-ai/dsh-user-questions";
 import { defineTool } from "@deepseek-ai/dsh-tools";
-import { openSnapshot, SnapshotError, type ApprovalDetails, type SnapshotManager, type SnapshotOptions, type SnapshotTransaction } from "@minder/core-snapshot";
+import { openSnapshot, SnapshotError, SnapshotManager, type ApprovalDetails, type SnapshotOptions, type SnapshotTransaction } from "@minder/core-snapshot";
 import { homedir } from "node:os";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 
@@ -13,7 +13,7 @@ export interface Config extends Pick<SnapshotOptions, "maxFileBytes" | "maxBytes
   additionalReadOnlyTools?: string[];
 }
 
-const permitted = new Set(["read", "grep", "glob", "read_image", "ask_user_question", "minder_files", "minder_file_read",
+const permitted = new Set(["read", "grep", "glob", "read_image", "ask_user_question", "minder_files", "minder_file_read", "minder_list_files",
   "minder_memory_search", "minder_memory_propose", "minder_firewall_inbox"]);
 
 export function apply(ctx: Context, config: Config = {}) {
@@ -69,6 +69,28 @@ export function apply(ctx: Context, config: Config = {}) {
     }
     return permitted.has(call.name) || additional.has(call.name) ? undefined : "Use minder_files for managed writes. Additional read-only tools may be admitted by the owner.";
   });
+  ctx.tools.register(defineTool({
+    name:"minder_list_files",
+    description:"List committed files and directories under the session workspace. Use nextOffset to request the next page. Staged changes appear after commit.",
+    parameters:{
+      path:{type:"string",description:"Directory within the workspace. Defaults to the workspace root."},
+      offset:{type:"integer",description:"Number of visible entries to skip. Defaults to 0."},
+      limit:{type:"integer",description:"Entries per page, from 1 to 200. Defaults to 100."}
+    },
+    output:{schema:{type:"string"},render:(_,text)=>[{type:"text",text}]},
+    async execute({path,offset,limit},exec) {
+      if (!exec.agent || exec.agent.session.header.origin === "subagent") throw new Error("Owner session required.");
+      const session = exec.agent.session;
+      await settling.get(session.id);
+      exec.signal.throwIfAborted();
+      const {workspaceRoot} = ctx.sandboxPolicy.resolve({session});
+      const current = turns.get(session.id)?.manager;
+      // 读取目录时跳过事务恢复，防止只读会话提交上次中断的写入。
+      const manager = current ?? new SnapshotManager({...config, roots:[workspaceRoot], stateDir, protectedPaths});
+      try { return JSON.stringify(manager.listDirectory(path,offset,limit)); }
+      finally { if (!current) manager.close(); }
+    }
+  }));
   ctx.tools.register(defineTool({
     name:"minder_file_read",description:"Read UTF-8 text from the open task transaction, including its staged changes.",
     parameters:{path:{type:"string",required:true}},

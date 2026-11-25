@@ -37,6 +37,13 @@ export function apply(ctx: Context) {
       if (capability==="snapshot") {
         assert.equal(JSON.parse(String(result.value)).status,"committed");
         assert.equal(await readFile(join(workspace,"review.txt"),"utf8"),query.expected);
+        const listing = await ctx.tools.execute({
+          agent:handle.agent, signal:AbortSignal.timeout(30000),
+          calls:[{type:"tool-call", id:randomUUID() as never, name:"minder_list_files", arguments:"{}"}]
+        });
+        const files = listing.results[0].result;
+        assert.equal(files.isError,false,JSON.stringify(files));
+        assert.deepEqual(JSON.parse(String(files.value)),{entries:[{name:"review.txt",kind:"file"}],nextOffset:null});
       } else assert.equal(result.value,query.expected);
     } finally { await handle.dispose(); }
     return "MINDER_STANDALONE_OK dsh-plugin-minder-"+capability;

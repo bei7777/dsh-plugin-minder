@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-import { readFile, realpath, writeFile } from "node:fs/promises";
+import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import type { Context } from "@deepseek-ai/cordis";
@@ -35,6 +35,20 @@ export function apply(ctx: Context) {
     try {
       const file = join(workspace,"notes.md");
       await writeFile(file,"alpha\n");
+      const project = join(workspace,"project");
+      await mkdir(join(project,".git"),{recursive:true});
+      await mkdir(join(project,"sources"));
+      await writeFile(join(project,"plan.md"),"Published plans\n");
+      agent.session.append("sandbox/mode",{mode:"read-only"});
+      const first = await run("minder_list_files",{path:"project",limit:1});
+      assert.equal(first.isError,false,JSON.stringify(first));
+      assert.deepEqual(JSON.parse(String(first.value)),{entries:[{name:"plan.md",kind:"file"}],nextOffset:1});
+      const second = await run("minder_list_files",{path:"project",limit:1,offset:1});
+      assert.deepEqual(JSON.parse(String(second.value)),{entries:[{name:"sources",kind:"directory"}],nextOffset:null});
+      assert.equal((await run("minder_list_files",{path:".."})).isError,true);
+      assert.equal((await run("minder_list_files",{path:"project/.git"})).isError,true);
+      assert.equal((await run("minder_files",{label:"read only",operations:[{kind:"remove",path:"notes.md"}]})).isError,true);
+      agent.session.append("sandbox/mode",{mode:"workspace-write"});
       agent.session.append("turn/start",{turn:1});
       const edit = await run("minder_files",{label:"Two edits",operations:[
         {kind:"edit",path:"notes.md",oldText:"alpha",content:"beta"}
@@ -52,6 +66,8 @@ export function apply(ctx: Context) {
       assert.equal(JSON.parse(String(edit.value)).id,diff.id);
       assert.equal(diff.files.length,2);
       await assert.rejects(readFile(join(workspace,"agenda.md")),{code:"ENOENT"});
+      const visible = await run("minder_list_files",{});
+      assert.deepEqual(JSON.parse(String(visible.value)).entries,[{name:"notes.md",kind:"file"},{name:"project",kind:"directory"}]);
       agent.session.append("turn/end",{turn:1,reason:{kind:"completed"}});
       await ctx.sessions.flush(agent.session);
       assert.equal(await readFile(file,"utf8"),"beta\n");
